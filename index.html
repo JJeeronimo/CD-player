@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Playlist do Jeronimo</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="player-container"> 
+    <div id="cdPlayerWindow" class="window" style="width:320px">
+        <div class="title-bar">
+            <div class="title-bar-text">
+                <img src="https://images2.imgbox.com/42/89/JIRoQjUo_o.png"/>
+                CD Player
+            </div>
+            <div class="title-bar-controls"></div>
+        </div>
+        <div class="window-body">
+            <div class="toptoptop">
+                <div class="menu-item">
+                    <span><u>D</u>isc</span>
+                    <ul class="dropdown-menu">
+                        <li id="menuEject">Eject</li>
+                        <li id="menuAddMusic"><u>A</u>dicionar Música</li>
+                    </ul>
+                </div>
+                <div class="menu-item">
+                    <span><u>V</u>iew</span>
+                    <ul class="dropdown-menu">
+                        <li id="menuViewNormal">Normal</li>
+                        <li id="menuViewCompact">Compact</li>
+                        <li class="separator"></li>
+                        <li id="menuViewVolume">Volume Control</li>
+                    </ul>
+                </div>
+                <div class="menu-item">
+                    <span><u>O</u>ptions</span>
+                    <ul class="dropdown-menu">
+                        <li id="menuOptRandom"><span class="checkmark"></span>Random Order</li>
+                        <li id="menuOptContinuous"><span class="checkmark active">✓</span>Continuous Play</li>
+                    </ul>
+                </div>
+            </div>
+
+            <p id="text2">[00] 00:00</p>
+            <div class="buttontos">
+                <p id="playButton" class="control-butt">▶</p>
+                <p id="pauseButton" class="control-butt">❚❚</p>
+                <p id="stopButton" class="control-butt"><span>◼</span></p>
+                <p id="previousTrackButton" class="control-butt">❚◄◄</p>
+                <p id="rewindButton" class="control-butt">◄◄</p>
+                <p id="forwardButton" class="control-butt">►►</p>
+                <p id="nextTrackButton" class="control-butt">►►❚</p>
+                <p id="ejectButton" class="control-butt"><span>❚ ►</span></p>
+            </div>
+
+            <div class="volume-control">
+                <label for="volumeSlider">Volume</label>
+                <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
+            </div>
+            
+            <div class="ahhh">
+                <p id="label"><u>A</u>rtist:</p>
+                <p id="text" class="artist"></p>
+                <p id="label">Title:</p>
+                <p id="text" class="title"></p>
+            </div>
+        </div>
+        <div class="status-bar">
+            <p class="status-bar-field">Total Play: 00:00 m:s</p>
+            <p class="status-bar-field">Track: 00:00 m:s</p>
+        </div>
+    </div>
+</div>  
+<input type="file" id="fileInput" accept="audio/*" style="display:none;">
+
+<script src="script.js"></script>
+</body>
+</html>

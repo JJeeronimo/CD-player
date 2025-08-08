@@ -1,0 +1,94 @@
+:root {
+    --artist: "No Disc";
+    --title: "";
+    --albumcover: none;
+}
+    
+body {
+    background-color: #ffffff; /* Fundo teal, clássico do Windows */
+}
+
+.status-bar, .title-bar { display: flex; }
+.window { background: silver; text-shadow: none; box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #dfdfdf, inset -2px -2px grey, inset 2px 2px #fff; padding: 3px; color: #000!important; font-family: "Pixelated MS Sans Serif"!important; transition: width 0.2s ease-in-out, transform 0.3s ease-in-out; }
+.window * { -webkit-font-smoothing: none; font-family: "Pixelated MS Sans Serif", Arial; font-size: 11px; text-shadow: inherit; }
+.window img { filter: none!important; }
+p#text, p#text2 { box-shadow: inset -1px -1px #fff, inset 1px 1px grey, inset -2px -2px #dfdfdf, inset 2px 2px #0a0a0a; box-sizing: border-box; margin-block: 3px; }
+.control-butt, p#text, p#text2 { box-sizing: border-box; }
+p#label, p#text, p#text2 { margin-block: 3px; }
+.status-bar, .title-bar-text, .toptoptop, .control-butt, p#label, p#text2 { user-select: none; }
+    
+@font-face { font-family: "Pixelated MS Sans Serif"; font-style: normal; font-weight: 400; src: url(https://unpkg.com/98.css@0.1.20/dist/ms_sans_serif.woff) format("woff"), url(https://unpkg.com/98.css@0.1.20/dist/ms_sans_serif_bold.woff2) format("woff2"); }
+@font-face { font-family: "Pixelated MS Sans Serif"; font-style: normal; font-weight: 700; src: url(https://unpkg.com/98.css@0.1.20/dist/ms_sans_serif_bold.woff) format("woff"), url(https://unpkg.com/98.css@0.1.20/dist/ms_sans_serif_bold.woff2) format("woff2"); }
+
+.title-bar { align-items: center; background: linear-gradient(90deg, navy, #1084d0); justify-content: space-between; padding: 2px; }
+.title-bar-text { color: #fff; font-weight: 700; letter-spacing: 0; margin-right: 24px; line-height: 15px; }
+.title-bar-text img { vertical-align: bottom; margin-inline: 2px; }
+.title-bar-controls { display: none; }
+.window-body { margin: 8px; }
+
+/* --- ESTILOS DOS MENUS --- */
+.toptoptop { display: flex; text-align: left; margin-top: -3px !important; margin-bottom: 5px !important; margin-inline: 0px !important; position: relative; }
+.menu-item { position: relative; }
+.menu-item > span { border: 1px solid silver; padding: 2px 4px; cursor: pointer; }
+.dropdown-menu { display: none; position: absolute; top: 100%; left: 0; background: silver; box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px grey, inset 2px 2px #dfdfdf; border: 1px solid silver; padding: 2px; margin: 0; list-style: none; min-width: 120px; z-index: 1000; }
+.menu-item.active .dropdown-menu { display: block; }
+.menu-item > span.active { background: #e6e6e6; border: 1px dotted black; }
+.dropdown-menu li { padding: 3px 10px 3px 20px; cursor: pointer; white-space: nowrap; position: relative; }
+.dropdown-menu li:hover { background-color: navy; color: white; }
+.dropdown-menu li.separator { height: 1px; background-color: grey; margin: 4px 1px; box-shadow: 1px 1px #fff; padding: 0; cursor: default; }
+.dropdown-menu li:hover.separator { background: grey; } 
+.checkmark { display: inline-block; width: 15px; text-align: left; position: absolute; left: 3px; top: 3px; }
+.checkmark.active { content: '✓'; }
+
+/* Display de tempo e imagem */
+p#text2 { position: relative; display: inline-block; padding: 13px 4px; width: 54%; font-size: 20px; text-align: center; color: rgb(253, 253, 4); background: #000; z-index: 1; }
+p#text2:before { content: ""; display: block; position: absolute; top: 1px; left: 1px; background-image: var(--albumcover); width: 98%; height: 96%; opacity: .5; background-size: cover; background-position: center; z-index: -1; }
+
+.buttontos { display: inline-block; width: 45%; height: 54px; vertical-align: top; text-align: center; }
+.control-butt { display: inline-block; border: none; border-radius: 0; background: silver; min-height: 23px; min-width: 20px; max-width: 20px; margin: 2px; padding: 6px 0; box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px grey, inset 2px 2px #dfdfdf; color: #000; text-shadow: 1px 1px #fff; line-height: 10px; cursor: pointer; font-size: 12px; white-space: nowrap; }
+.control-butt:active { box-shadow: inset -1px -1px #fff, inset 1px 1px #0a0a0a, inset -2px -2px #dfdfdf, inset 2px 2px grey; text-shadow: 1px 1px #222; }
+.control-butt:focus { outline: #000 dotted 1px; outline-offset: -4px; }
+#playButton { min-width: 75px; } #pauseButton, #stopButton { text-indent: -5px; font-weight: 700; } #stopButton span { display: block; transform: translate(2px, -2px) scale(1.2); } #previousTrackButton, #rewindButton, #forwardButton, #nextTrackButton { text-indent: -8px; font-weight: 700; letter-spacing: -4px; font-size: 10px; } #ejectButton { text-indent: -8px; font-weight: 700; letter-spacing: -1.5px; text-shadow: none; transform: translateY(1px); } #ejectButton span { display: block; transform: rotate(-90deg) translate(2px, 0) scaleY(1.4); color: #000; }
+    
+/* --- ESTILOS DE FUNCIONALIDADES --- */
+.ahhh { text-align: right; }
+.volume-control { display: none; margin-top: 5px; } 
+.volume-control.active { display: block; text-align: center; padding: 5px 0; } 
+.window.compact { width: 180px !important; } 
+.window.compact .ahhh, .window.compact .status-bar { display: none; }
+.window.compact p#text2 { width: 98%; }
+.window.compact .buttontos { width: 98%; height: auto; }
+
+/* --- ESTILO RETRÔ PARA O CONTROLE DE VOLUME --- */
+#volumeSlider { -webkit-appearance: none; appearance: none; width: 80%; height: 20px; background: transparent; outline: none; }
+#volumeSlider::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: silver; border-right: 1px solid #fff; border-bottom: 1px solid #fff; border-left: 1px solid grey; border-top: 1px solid grey; box-shadow: inset 1px 1px 0px #0a0a0a; }
+#volumeSlider::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 15px; background: silver; cursor: pointer; margin-top: -8px; box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px grey, inset 2px 2px #dfdfdf; border: 1px solid #0a0a0a; }
+#volumeSlider::-moz-range-track { width: 100%; height: 4px; cursor: pointer; background: silver; border-right: 1px solid #fff; border-bottom: 1px solid #fff; border-left: 1px solid grey; border-top: 1px solid grey; box-shadow: inset 1px 1px 0px #0a0a0a; }
+#volumeSlider::-moz-range-thumb { height: 20px; width: 15px; background: silver; cursor: pointer; border-radius: 0; box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px grey, inset 2px 2px #dfdfdf; border: 1px solid #0a0a0a; }
+
+p#label { display: inline-block; width: fit-content; margin-right: 5px; font-size: 12px; }
+p#text { display: inline-block; background-color: #fff; padding: 4px; width: 85%; text-align: left; font-size: 12px; }
+p#text.artist:after { content: var(--artist); }
+p#text.title:after { content: var(--title); }
+.title, .artist { height: 23px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding-right: 20px!important; vertical-align: bottom; }
+    
+.status-bar { gap: 1px; margin: 0 1px; }
+.status-bar-field { box-shadow: inset -1px -1px #dfdfdf, inset 1px 1px grey; flex-grow: 1; margin: 0; padding: 2px 3px; }
+
+/* --- CSS PARA AUMENTAR O PLAYER EM TELAS GRANDES --- */
+.player-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 100vh;
+    padding: 2em 0;
+    box-sizing: border-box;
+    overflow: hidden;         
+}
+@media screen and (min-width: 1024px) {
+    #cdPlayerWindow {
+        transform: scale(4); 
+        margin: 0; 
+    }
+}
