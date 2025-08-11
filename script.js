@@ -15,13 +15,73 @@ document.addEventListener('DOMContentLoaded', () => {
     const menuAddMusic = document.getElementById('menuAddMusic');
 
     // Inicialize a playlist como um array vazio
-    const playlist = [];
+    let playlist = [];
     
     const audio = new Audio();
     let currentTrackIndex = 0;
     let isPlaying = false;
     let isShuffle = false;
     let isContinuous = true;
+    let lastKnownTime = 0;
+
+    // --- CÓDIGO NOVO PARA INDEXEDDB ---
+    let db;
+    const request = indexedDB.open("JeronimoPlayerDB", 1);
+
+    request.onerror = function(event) {
+        console.error("IndexedDB error:", event.target.errorCode);
+    };
+
+    request.onupgradeneeded = function(event) {
+        db = event.target.result;
+        db.createObjectStore("playlistStore", { keyPath: "id", autoIncrement: true });
+    };
+
+    request.onsuccess = function(event) {
+        db = event.target.result;
+        loadSavedPlaylist();
+    };
+
+    function savePlaylist() {
+        localStorage.setItem('currentTrackIndex', currentTrackIndex);
+        localStorage.setItem('lastKnownTime', audio.currentTime);
+        localStorage.setItem('isPlaying', isPlaying);
+    }
+
+    function loadSavedPlaylist() {
+        const transaction = db.transaction(["playlistStore"], "readonly");
+        const objectStore = transaction.objectStore("playlistStore");
+        const getRequest = objectStore.getAll();
+
+        getRequest.onsuccess = function(event) {
+            playlist = event.target.result;
+            const savedIndex = localStorage.getItem('currentTrackIndex');
+            currentTrackIndex = savedIndex ? parseInt(savedIndex, 10) : 0;
+            const savedTime = localStorage.getItem('lastKnownTime');
+            lastKnownTime = savedTime ? parseFloat(savedTime) : 0;
+            
+            if (playlist.length > 0) {
+                const currentTrack = playlist[currentTrackIndex];
+                if (currentTrack.audioFile) {
+                    const blobUrl = URL.createObjectURL(currentTrack.audioFile);
+                    audio.src = blobUrl;
+                }
+                updateDisplay();
+            }
+        };
+    }
+
+    // --- NOVO: Inicia a reprodução com interação do usuário ---
+    document.body.addEventListener('click', () => {
+        if (!isPlaying && playlist.length > 0) {
+            const savedIsPlaying = localStorage.getItem('isPlaying');
+            if (savedIsPlaying === 'true') {
+                audio.currentTime = lastKnownTime;
+                audio.play();
+                isPlaying = true;
+            }
+        }
+    }, { once: true });
 
     function updateDisplay(isEjected = false) {
         const root = document.documentElement;
@@ -57,10 +117,15 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             audio.play();
             isPlaying = true;
+            savePlaylist();
         }
     }
 
-    function pauseMusic() { audio.pause(); isPlaying = false; }
+    function pauseMusic() { 
+        audio.pause(); 
+        isPlaying = false; 
+        savePlaylist();
+    }
     
     function stopMusic() {
         audio.pause();
@@ -72,6 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             updateDisplay(true);
         }
+        savePlaylist();
     }
     
     function loadTrack(trackIndex, autoplay = false) {
@@ -80,12 +146,17 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         currentTrackIndex = trackIndex;
-        audio.src = playlist[currentTrackIndex].url;
+        
+        // --- NOVO: Carrega o Blob do arquivo para reprodução ---
+        const blobUrl = URL.createObjectURL(playlist[currentTrackIndex].audioFile);
+        audio.src = blobUrl;
+
         updateDisplay();
         if (autoplay) {
-            audio.play();
+            audio.play().catch(e => console.error("Erro ao tocar áudio:", e));
             isPlaying = true;
         }
+        savePlaylist();
     }
 
     function nextTrack() {
@@ -107,8 +178,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function ejectDisc() {
         stopMusic();
+        playlist = [];
         audio.src = '';
         updateDisplay(true);
+        // --- NOVO: Limpa o IndexedDB e o localStorage ---
+        const transaction = db.transaction(["playlistStore"], "readwrite");
+        const objectStore = transaction.objectStore("playlistStore");
+        objectStore.clear();
+        localStorage.removeItem('currentTrackIndex');
+        localStorage.removeItem('isPlaying');
+        localStorage.removeItem('lastKnownTime');
     }
 
     playButton.addEventListener('click', playMusic);
@@ -152,21 +231,67 @@ document.addEventListener('DOMContentLoaded', () => {
         fileInput.click();
         closeAllMenus();
     });
+
     fileInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
-        if (file) {
-            const fileURL = URL.createObjectURL(file);
-            const title = file.name.replace(/\.[^/.]+$/, "");
-            const newTrack = {
-                artist: "Artista Desconhecido",
-                title: title,
-                url: fileURL,
-                albumCoverUrl: "https://images2.imgbox.com/42/89/JIRoQjUo_o.png"
-            };
-            playlist.push(newTrack);
-            loadTrack(playlist.length - 1, true);
-            fileInput.value = '';
+        
+        if (file && file.type.startsWith('audio/')) {
+            window.jsmediatags.read(file, {
+                onSuccess: (tag) => {
+                    const tags = tag.tags;
+                    
+                    let albumCoverUrl = "https://images2.imgbox.com/42/89/JIRoQjUo_o.png";
+                    if (tags.picture) {
+                        const { data, format } = tags.picture;
+                        let base64String = "";
+                        for (let i = 0; i < data.length; i++) {
+                            base64String += String.fromCharCode(data[i]);
+                        }
+                        albumCoverUrl = `data:${format};base64,${window.btoa(base64String)}`;
+                    }
+
+                    const newTrack = {
+                        artist: tags.artist || "Artista Desconhecido",
+                        title: tags.title || file.name.replace(/\.[^/.]+$/, ""),
+                        albumCoverUrl: albumCoverUrl,
+                        audioFile: file // --- NOVO: Salva o arquivo de áudio (Blob) aqui ---
+                    };
+                    
+                    // --- NOVO: Saloca a faixa no IndexedDB ---
+                    const transaction = db.transaction(["playlistStore"], "readwrite");
+                    const objectStore = transaction.objectStore("playlistStore");
+                    const addRequest = objectStore.add(newTrack);
+
+                    addRequest.onsuccess = function(event) {
+                        playlist.push(newTrack);
+                        loadTrack(playlist.length - 1, true);
+                    };
+
+                },
+                onError: (error) => {
+                    console.log('Erro ao ler as tags:', error.type, error.info);
+                    const newTrack = {
+                        artist: "Artista Desconhecido",
+                        title: file.name.replace(/\.[^/.]+$/, ""),
+                        albumCoverUrl: "https://images2.imgbox.com/42/89/JIRoQjUo_o.png",
+                        audioFile: file // --- NOVO: Salva o arquivo de áudio (Blob) aqui ---
+                    };
+                    
+                    // --- NOVO: Salva a faixa no IndexedDB ---
+                    const transaction = db.transaction(["playlistStore"], "readwrite");
+                    const objectStore = transaction.objectStore("playlistStore");
+                    const addRequest = objectStore.add(newTrack);
+
+                    addRequest.onsuccess = function(event) {
+                        playlist.push(newTrack);
+                        loadTrack(playlist.length - 1, true);
+                    };
+                }
+            });
+        } else if (file) {
+            alert("Por favor, selecione um arquivo de áudio válido.");
         }
+        fileInput.value = '';
     });
     
     document.getElementById('menuViewNormal').addEventListener('click', () => {
@@ -200,7 +325,26 @@ document.addEventListener('DOMContentLoaded', () => {
         closeAllMenus();
     });
     
+    window.addEventListener('keydown', (e) => {
+        if (e.altKey) {
+            const key = e.key.toLowerCase();
+            let menuToClick = null;
+            if (key === 'd') {
+                menuToClick = document.querySelector('.menu-item:nth-child(1) > span');
+            } else if (key === 'v') {
+                menuToClick = document.querySelector('.menu-item:nth-child(2) > span');
+            } else if (key === 'o') {
+                menuToClick = document.querySelector('.menu-item:nth-child(3) > span');
+            }
+            
+            if (menuToClick) {
+                e.preventDefault();
+                menuToClick.click();
+            }
+        }
+    });
+
     window.addEventListener('click', closeAllMenus);
     
-    updateDisplay(true);
+    updateDisplay(!playlist.length);
 });
