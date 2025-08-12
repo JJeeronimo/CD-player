@@ -7,19 +7,21 @@
 
 /* --- Estilos Gerais --- */
 body {
-    background-color: #ffffff; /* Fundo branco para simular o Windows */
+    background-color: #ffffff;
 }
 
 /* Container principal para centralizar o player em telas grandes */
 .player-container {
     display: flex;
     justify-content: center;
-    align-items: center;
-    width: 100%;
+    align-items: flex-start; /* Alinha no topo */
+    width: auto;
     min-height: 100vh;
-    padding: 2em 0;
+    padding: 2em;
     box-sizing: border-box;
     overflow: hidden;
+    position: relative;
+    transition: transform 0.4s ease-in-out;
 }
 
 /* --- Estilos da Janela (Window) --- */
@@ -30,7 +32,9 @@ body {
     padding: 3px;
     color: #000!important;
     font-family: "Pixelated MS Sans Serif"!important;
-    transition: width 0.2s ease-in-out, transform 0.3s ease-in-out;
+    transition: width 0.4s ease-in-out, transform 0.3s ease-in-out;
+    position: relative;
+    flex-shrink: 0; /* Impede que o player encolha */
 }
 
 .window * {
@@ -46,9 +50,15 @@ body {
 
 .window-body {
     margin: 8px;
+    transition: filter 0.3s ease;
 }
 
-/* Estilo para a versão compacta do player */
+/* MODIFICADO: Não precisa mais borrar */
+.window-body.hidden {
+    filter: none;
+    pointer-events: auto;
+}
+
 .window.compact {
     width: 180px !important;
 }
@@ -324,10 +334,9 @@ p#text2:before {
 }
 
 .control-butt:focus {
-    outline: none; /* Remove o pontilhado padrão */
+    outline: none;
 }
 
-/* Estilos específicos para cada botão */
 #playButton {
     min-width: 75px;
 }
@@ -349,18 +358,13 @@ p#text2:before {
     font-size: 10px;
 }
 
-#ejectButton {
-    text-indent: -8px;
-    font-weight: 700;
-    letter-spacing: -1.5px;
-    text-shadow: none;
-    transform: translateY(1px);
-}
-
-#ejectButton span {
-    display: block;
-    transform: rotate(-90deg) translate(2px, 0) scaleY(1.4);
-    color: #000;
+#queueButton {
+    text-indent: 0;
+    font-size: 16px;
+    font-weight: bold;
+    min-width: 20px;
+    max-width: 20px;
+    padding-top: 4px;
 }
 
 /* --- Estilos do Controle de Volume --- */
@@ -429,16 +433,140 @@ p#text2:before {
     border: 1px solid #0a0a0a;
 }
 
+/* --- MODIFICADO: Estilos da Fila de Músicas (Painel Ancorado) --- */
+.playlist-container {
+    display: flex;
+    flex-direction: column;
+    width: 250px;
+    height: 400px; /* Altura do player principal */
+    max-height: 80vh;
+    margin-left: 5px;
+    overflow: hidden;
+    
+    transition: max-width 0.4s ease-in-out, opacity 0.4s ease-in-out, margin-left 0.4s ease-in-out;
+    max-width: 0; /* Começa escondido */
+    opacity: 0;
+    
+    box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #dfdfdf, inset -2px -2px grey, inset 2px 2px #fff;
+    z-index: 1000;
+    border: 3px solid silver;
+    background-color: silver;
+}
+
+.playlist-container.active {
+    max-width: 250px;
+    opacity: 1;
+}
+
+.playlist-view {
+    list-style: none;
+    margin: 0;
+    padding: 5px;
+    background: white;
+    box-shadow: inset 0 0 0 1px #0a0a0a, inset 1px 1px 0 1px grey, inset -1px -1px 0 1px #dfdfdf;
+    height: 100%;
+    overflow-y: auto;
+}
+
+/* --- NOVO: Estilos para os itens da lista --- */
+.playlist-view li {
+    padding: 3px 5px;
+    cursor: default; /* Cursor padrão, o título será clicável */
+    border: 1px solid transparent;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.playlist-view li:hover .remove-track-btn {
+    opacity: 1;
+}
+
+.playlist-view li.active {
+    background: navy;
+    color: white;
+    border: 1px dotted white;
+}
+.playlist-view li.active .track-title {
+    color: white; /* Garante que o texto do título fique branco */
+}
+.playlist-view li .track-title:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.track-info {
+    font-weight: bold;
+    margin-right: 8px;
+    flex-shrink: 0;
+}
+
+.track-info.playing-indicator {
+    color: #3cff3c;
+    text-shadow: 0 0 2px black;
+}
+
+.track-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex-grow: 1;
+    color: black;
+}
+
+.track-duration {
+    margin-left: 8px;
+    flex-shrink: 0;
+}
+
+.remove-track-btn {
+    background: silver;
+    border: 1px solid grey;
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+    line-height: 12px;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+    box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff;
+    flex-shrink: 0;
+}
+
+.remove-track-btn:active {
+    box-shadow: inset 1px 1px #0a0a0a, inset -1px -1px #fff;
+}
+
+/* --- NOVO: Estilos para a barra de rolagem --- */
+.playlist-view::-webkit-scrollbar {
+    width: 16px;
+}
+.playlist-view::-webkit-scrollbar-track {
+    background: silver;
+}
+.playlist-view::-webkit-scrollbar-thumb {
+    background: silver;
+    box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px grey, inset 2px 2px #dfdfdf;
+    border: 1px solid #a0a0a0;
+}
+
+
 /* --- Media Queries (Responsividade) --- */
 @media screen and (min-width: 1024px) {
+    .player-container {
+        transform: scale(1.5); /* Ajuste a escala conforme necessário */
+        align-items: center;
+    }
+    
     #cdPlayerWindow {
-        transform: scale(4);
+        transform: none; /* Remove a escala individual */
         margin: 0;
     }
 
-    /* Alternativa Acessível: Faz o botão focado parecer "pressionado" */
     .control-butt:focus {
-        outline: none; /* Remove o pontilhado */
+        outline: none;
         box-shadow: inset -1px -1px #fff, inset 1px 1px #0a0a0a, inset -2px -2px #dfdfdf, inset 2px 2px grey;
     }
 }
