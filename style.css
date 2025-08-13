@@ -10,16 +10,16 @@ body {
     background-color: #ffffff;
 }
 
-/* Container principal para centralizar o player em telas grandes */
+/* MODIFICADO: Container principal para centralizar o player e permitir adaptação */
 .player-container {
     display: flex;
     justify-content: center;
-    align-items: flex-start; /* Alinha no topo */
+    align-items: center;
+    flex-wrap: wrap; /* Permite que os itens quebrem a linha */
     width: auto;
     min-height: 100vh;
     padding: 2em;
     box-sizing: border-box;
-    overflow: hidden;
     position: relative;
     transition: transform 0.4s ease-in-out;
 }
@@ -30,11 +30,12 @@ body {
     text-shadow: none;
     box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #dfdfdf, inset -2px -2px grey, inset 2px 2px #fff;
     padding: 3px;
-    color: #000!important;
-    font-family: "Pixelated MS Sans Serif"!important;
+    color: #000 !important;
+    font-family: "Pixelated MS Sans Serif" !important;
     transition: width 0.4s ease-in-out, transform 0.3s ease-in-out;
     position: relative;
-    flex-shrink: 0; /* Impede que o player encolha */
+    flex-shrink: 0;
+    z-index: 2; /* Garante que o player fique acima da playlist */
 }
 
 .window * {
@@ -45,7 +46,7 @@ body {
 }
 
 .window img {
-    filter: none!important;
+    filter: none !important;
 }
 
 .window-body {
@@ -53,7 +54,6 @@ body {
     transition: filter 0.3s ease;
 }
 
-/* MODIFICADO: Não precisa mais borrar */
 .window-body.hidden {
     filter: none;
     pointer-events: auto;
@@ -63,7 +63,8 @@ body {
     width: 180px !important;
 }
 
-.window.compact .ahhh, .window.compact .status-bar {
+.window.compact .ahhh,
+.window.compact .status-bar {
     display: none;
 }
 
@@ -77,7 +78,8 @@ body {
 }
 
 /* --- Títulos e Barras --- */
-.status-bar, .title-bar {
+.status-bar,
+.title-bar {
     display: flex;
 }
 
@@ -146,7 +148,7 @@ body {
     position: relative;
 }
 
-.menu-item > span {
+.menu-item>span {
     border: 1px solid silver;
     padding: 2px 4px;
     cursor: pointer;
@@ -171,7 +173,7 @@ body {
     display: block;
 }
 
-.menu-item > span.active {
+.menu-item>span.active {
     background: #e6e6e6;
     border: 1px dotted black;
 }
@@ -215,13 +217,16 @@ body {
 }
 
 /* --- Estilos de Exibição de Texto (Display) --- */
-.text-display, p#text2 {
+.text-display,
+p#text2 {
     box-shadow: inset -1px -1px #fff, inset 1px 1px grey, inset -2px -2px #dfdfdf, inset 2px 2px #0a0a0a;
     box-sizing: border-box;
     margin-block: 3px;
 }
 
-p#label, .text-display, p#text2 {
+p#label,
+.text-display,
+p#text2 {
     margin-block: 3px;
 }
 
@@ -249,12 +254,13 @@ p#label {
     content: var(--title);
 }
 
-.title, .artist {
+.title,
+.artist {
     height: 23px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    padding-right: 20px!important;
+    padding-right: 20px !important;
     vertical-align: bottom;
 }
 
@@ -294,11 +300,16 @@ p#text2:before {
     font-family: "Pixelated MS Sans Serif", Arial;
 }
 
-.control-butt, .text-display, p#text2 {
+.control-butt,
+.text-display,
+p#text2 {
     box-sizing: border-box;
 }
 
-.toptoptop, .control-butt, p#label, p#text2 {
+.toptoptop,
+.control-butt,
+p#label,
+p#text2 {
     user-select: none;
 }
 
@@ -341,7 +352,8 @@ p#text2:before {
     min-width: 75px;
 }
 
-#pauseButton, #stopButton {
+#pauseButton,
+#stopButton {
     text-indent: -5px;
     font-weight: 700;
 }
@@ -351,7 +363,10 @@ p#text2:before {
     transform: translate(2px, -2px) scale(1.2);
 }
 
-#previousTrackButton, #rewindButton, #forwardButton, #nextTrackButton {
+#previousTrackButton,
+#rewindButton,
+#forwardButton,
+#nextTrackButton {
     text-indent: -8px;
     font-weight: 700;
     letter-spacing: -4px;
@@ -433,22 +448,22 @@ p#text2:before {
     border: 1px solid #0a0a0a;
 }
 
-/* --- MODIFICADO: Estilos da Fila de Músicas (Painel Ancorado) --- */
+/* --- Estilos da Fila de Músicas (Painel Ancorado) --- */
 .playlist-container {
     display: flex;
     flex-direction: column;
     width: 250px;
-    height: 400px; /* Altura do player principal */
+    height: 400px;
     max-height: 80vh;
     margin-left: 5px;
     overflow: hidden;
     
     transition: max-width 0.4s ease-in-out, opacity 0.4s ease-in-out, margin-left 0.4s ease-in-out;
-    max-width: 0; /* Começa escondido */
+    max-width: 0;
     opacity: 0;
     
     box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #dfdfdf, inset -2px -2px grey, inset 2px 2px #fff;
-    z-index: 1000;
+    z-index: 1; /* Z-index menor para ficar atrás do player por padrão */
     border: 3px solid silver;
     background-color: silver;
 }
@@ -461,35 +476,36 @@ p#text2:before {
 .playlist-view {
     list-style: none;
     margin: 0;
-    padding: 5px;
+    padding: 2px;
     background: white;
     box-shadow: inset 0 0 0 1px #0a0a0a, inset 1px 1px 0 1px grey, inset -1px -1px 0 1px #dfdfdf;
     height: 100%;
     overflow-y: auto;
 }
 
-/* --- NOVO: Estilos para os itens da lista --- */
+/* --- Estilos para os itens da lista --- */
 .playlist-view li {
-    padding: 3px 5px;
-    cursor: default; /* Cursor padrão, o título será clicável */
-    border: 1px solid transparent;
+    padding: 4px 6px;
+    cursor: default;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    border-bottom: 1px solid #e0e0e0;
 }
 
-.playlist-view li:hover .remove-track-btn {
-    opacity: 1;
+.playlist-view li:last-child {
+    border-bottom: none;
 }
 
 .playlist-view li.active {
     background: navy;
     color: white;
-    border: 1px dotted white;
 }
+
 .playlist-view li.active .track-title {
-    color: white; /* Garante que o texto do título fique branco */
+    color: white;
 }
+
 .playlist-view li .track-title:hover {
     text-decoration: underline;
     cursor: pointer;
@@ -497,8 +513,9 @@ p#text2:before {
 
 .track-info {
     font-weight: bold;
-    margin-right: 8px;
+    margin-right: 6px;
     flex-shrink: 0;
+    font-size: 11px;
 }
 
 .track-info.playing-indicator {
@@ -515,13 +532,15 @@ p#text2:before {
 }
 
 .track-duration {
-    margin-left: 8px;
+    margin-left: 6px;
     flex-shrink: 0;
+    font-size: 11px;
 }
 
+/* --- Design do Botão de Remover --- */
 .remove-track-btn {
     background: silver;
-    border: 1px solid grey;
+    border: none;
     color: #000;
     font-weight: bold;
     cursor: pointer;
@@ -530,22 +549,32 @@ p#text2:before {
     line-height: 12px;
     text-align: center;
     opacity: 0;
-    transition: opacity 0.2s;
+    transition: opacity 0.2s, background-color 0.2s;
     box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff;
     flex-shrink: 0;
+    font-size: 12px;
+    margin-left: 5px;
+    margin-right: 2px;
+}
+
+.playlist-view li:hover .remove-track-btn {
+    opacity: 1;
 }
 
 .remove-track-btn:active {
     box-shadow: inset 1px 1px #0a0a0a, inset -1px -1px #fff;
+    background-color: #d0d0d0;
 }
 
-/* --- NOVO: Estilos para a barra de rolagem --- */
+/* --- Estilos para a barra de rolagem --- */
 .playlist-view::-webkit-scrollbar {
     width: 16px;
 }
+
 .playlist-view::-webkit-scrollbar-track {
     background: silver;
 }
+
 .playlist-view::-webkit-scrollbar-thumb {
     background: silver;
     box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px grey, inset 2px 2px #dfdfdf;
@@ -554,19 +583,82 @@ p#text2:before {
 
 
 /* --- Media Queries (Responsividade) --- */
+
+/* Estilos para telas grandes (desktops) */
 @media screen and (min-width: 1024px) {
+    /* MUDANÇA PRINCIPAL: Centraliza e escala o player-container */
     .player-container {
-        transform: scale(1.5); /* Ajuste a escala conforme necessário */
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(1.8);
+        
+        /* Ajustes de flexbox para alinhar os itens internos */
+        display: flex;
+        flex-direction: row;
         align-items: center;
+        padding: 0;
+        min-height: auto;
     }
     
+    /* Player e Playlist agora se comportam normalmente dentro do container centralizado */
     #cdPlayerWindow {
-        transform: none; /* Remove a escala individual */
-        margin: 0;
+        margin-right: 5px;
     }
 
-    .control-butt:focus {
-        outline: none;
-        box-shadow: inset -1px -1px #fff, inset 1px 1px #0a0a0a, inset -2px -2px #dfdfdf, inset 2px 2px grey;
+    .playlist-container {
+        position: relative;
+        transform: none;
+        margin-left: 5px;
+        top: auto;
+        left: auto;
+        width: 250px;
+        height: 400px;
+    }
+}
+
+/* Estilos para telas pequenas (celulares, tablets) */
+@media screen and (max-width: 1023px) {
+    .player-container {
+        transform: none;
+        position: relative;
+        top: auto;
+        left: auto;
+        flex-direction: column;
+        align-items: center;
+        padding: 1em;
+        min-height: 100vh;
+    }
+    
+    #cdPlayerWindow, .playlist-container {
+        width: 95% !important;
+        max-width: 400px;
+    }
+    
+    .window {
+        margin-bottom: 1em;
+    }
+    
+    .playlist-container {
+        margin-left: 0;
+        margin-top: 1em;
+        height: 300px;
+        opacity: 1;
+        max-width: 95%;
+        position: relative;
+        left: auto;
+        top: auto;
+    }
+    
+    .window.compact {
+        width: 95% !important;
+    }
+    
+    .volume-control.active {
+        display: block;
+    }
+    
+    .toptoptop {
+        flex-wrap: wrap;
     }
 }
