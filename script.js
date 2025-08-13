@@ -271,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <span class="track-info ${isCurrentlyPlaying ? 'playing-indicator' : ''}">
                     ${isCurrentlyPlaying ? '►' : trackNumber + '.'}
                 </span>
-                <span class="track-title">${track.artist} - ${track.title}</span>
+                <span class="track-title">${track.title}</span>
                 <span class="track-duration">${track.duration ? formatTime(track.duration) : '--:--'}</span>
                 <button class="remove-track-btn" data-index="${index}">×</button>
             `;
